@@ -256,6 +256,9 @@
   .resume-number {
     @apply font-semibold text-red-700 underline decoration-dotted underline-offset-4 hover:text-black;
   }
+  .total-row td {
+    @apply border-t-2 border-black bg-yellow-100 text-center text-base font-extrabold text-black;
+  }
   .status-badge {
     @apply inline-flex min-w-16 items-center justify-center rounded-full px-2.5 py-1 text-xs font-bold;
   }

@@ -41,9 +41,10 @@ return new class extends Migration {
             $t->foreignId('student_id')->unique()->constrained('students')->cascadeOnDelete();
             $t->string('mapel', 20);
             $t->enum('jenis_nilai', ['UH', 'PTS', 'PAS', 'PAT', 'US']);
-            $t->date('tanggal_ujian');
-            $t->date('tanggal_validasi_pt');
+            $t->date('tanggal_ujian')->nullable();
+            $t->date('tanggal_validasi_pt')->nullable();
             $t->enum('status_testimoni', ['SUDAH', 'BELUM'])->default('BELUM');
+            $t->text('keterangan')->nullable();
             $t->timestamps();
         });
         foreach (['publikasi_ig', 'publikasi_tiktok'] as $table) {

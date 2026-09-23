@@ -24,7 +24,7 @@ class ActivityDataSheet implements FromArray, WithHeadings, WithTitle
   public function headings(): array
   {
     return match ($this->channel) {
-      'nilai' => ['Noreg', 'Mapel', 'Jenis Nilai', 'Tanggal Ujian', 'Tanggal Validasi PT', 'Status Testimoni'],
+      'nilai' => ['Noreg', 'Mapel', 'Jenis Nilai', 'Tanggal Ujian', 'Tanggal Validasi PT', 'Status Testimoni', 'Keterangan'],
       'ig' => ['Noreg', 'Status Publikasi', 'Jumlah Postingan', 'Tanggal Posting', 'Link Postingan', 'View', 'Like', 'Komen'],
       'tiktok' => ['Noreg', 'Jumlah Postingan', 'Tanggal Posting', 'Link Postingan', 'View', 'Like', 'Komen'],
       'wa' => ['Noreg', 'Jumlah Testimoni Terkirim', 'Tanggal Blast', 'Terkirim', 'Dibaca', 'Respon']
@@ -45,9 +45,9 @@ class ActivityGuideSheet implements FromArray, WithTitle
   }
   public function array(): array
   {
-    $common = [['PANDUAN PENGISIAN TEMPLATE ' . strtoupper($this->channel)], ['Gunakan sheet ' . strtoupper($this->channel) . ' untuk data yang akan diimport.'], ['Tanggal wajib menggunakan format DD/MM/YYYY.'], ['Noreg harus sudah terdaftar pada menu Data Siswa.']];
+    $common = [['PANDUAN PENGISIAN TEMPLATE ' . strtoupper($this->channel)], ['Gunakan sheet ' . strtoupper($this->channel) . ' untuk data yang akan diimport.'], ['Tanggal menggunakan format DD/MM/YYYY. Untuk import Nilai 100, Tanggal Ujian dan Tanggal Validasi PT boleh dikosongkan atau diisi dengan tanda -.'], ['Noreg harus sudah terdaftar pada menu Data Siswa.']];
     return match ($this->channel) {
-      'nilai' => array_merge($common, [['Mapel yang boleh diisi: ' . Mapel::orderBy('kode')->pluck('kode')->implode(', ') . '.'], ['Jenis Nilai yang boleh diisi: UH, PTS, PAS, PAT, US.'], ['Status Testimoni yang boleh diisi: SUDAH atau BELUM.'], ['Satu baris adalah satu catatan Nilai 100. Noreg yang sama boleh muncul untuk mapel atau tanggal berbeda.']]),
+      'nilai' => array_merge($common, [['Mapel yang boleh diisi: ' . Mapel::orderBy('kode')->pluck('kode')->implode(', ') . '.'], ['Jenis Nilai yang boleh diisi: UH, PTS, PAS, PAT, US.'], ['Status Testimoni yang boleh diisi: SUDAH atau BELUM.'], ['Keterangan boleh dikosongkan, maksimal 1.000 karakter.'], ['Satu baris adalah satu catatan Nilai 100. Noreg yang sama boleh muncul untuk mapel atau tanggal berbeda.']]),
       'ig' => array_merge($common, [['Status Publikasi yang boleh diisi: SUDAH atau BELUM.'], ['Jika SUDAH, isi jumlah postingan, tanggal, link HTTP/HTTPS, view, like, dan komen.'], ['Jumlah postingan minimal 1 untuk status SUDAH.']]),
       'tiktok' => array_merge($common, [['Isi jumlah postingan minimal 1, tanggal posting, link HTTP/HTTPS, view, like, dan komen.']]),
       'wa' => array_merge($common, [['Jumlah Testimoni Terkirim minimal 1.'], ['Nilai Dibaca tidak boleh lebih besar dari Terkirim.'], ['Nilai Respon tidak boleh lebih besar dari Dibaca.']])

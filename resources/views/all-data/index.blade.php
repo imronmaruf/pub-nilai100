@@ -15,20 +15,44 @@
                     type="date" name="from" value="{{ request('from') }}"></div>
             <div class="field"><label class="label" for="to">Tanggal akhir</label><input id="to"
                     type="date" name="to" value="{{ request('to') }}"></div>
-            <div class="field"><label class="label" for="kota">Kota</label><select id="kota" name="kota">
+            <div class="field"><label class="label" for="kota">Kota</label><select id="kota" name="kota[]"
+                    multiple data-filter-select>
                     <option value="">Semua kota</option>
                     @foreach ($cities as $city)
-                        <option value="{{ $city }}" @selected(request('kota') === $city)>{{ $city }}</option>
+                        <option value="{{ $city }}" @selected(in_array($city, (array) request('kota', []), true))>{{ $city }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="field"><label class="label" for="unit_id">Unit</label><select id="unit_id" name="unit_id">
+            <div class="field"><label class="label" for="unit_id">Unit</label><select id="unit_id" name="unit_id[]"
+                    multiple data-filter-select>
                     <option value="">Semua unit</option>
                     @foreach ($units as $unit)
-                        <option value="{{ $unit->id }}" @selected((string) request('unit_id') === (string) $unit->id)>{{ $unit->nama_unit }}</option>
+                        <option value="{{ $unit->id }}" @selected(in_array($unit->id, array_map('intval', (array) request('unit_id', [])), true))>{{ $unit->nama_unit }}</option>
                     @endforeach
                 </select>
             </div>
+            @foreach ([['asal_sekolah', 'Asal sekolah', $schools], ['kelas_di_go', 'Kelas di GO', $goClasses], ['tingkat_kelas', 'Tingkat kelas', $grades]] as [$name, $label, $values])
+                <div class="field"><label class="label" for="{{ $name }}">{{ $label }}</label><select
+                        id="{{ $name }}" name="{{ $name }}[]" multiple data-filter-select>
+                        @foreach ($values as $value)
+                            <option value="{{ $value }}" @selected(in_array($value, (array) request($name, []), true))>{{ $value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endforeach
+            <div class="field"><label class="label" for="level">Level</label><select id="level" name="level[]"
+                    multiple data-filter-select>
+                    @foreach (['SD', 'SMP', 'SMA'] as $value)
+                        <option value="{{ $value }}" @selected(in_array($value, (array) request('level', []), true))>{{ $value }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="field"><label class="label" for="status_testimoni">Status testimoni</label><select
+                    id="status_testimoni" name="status_testimoni[]" multiple data-filter-select>
+                    @foreach (['SUDAH', 'BELUM'] as $value)
+                        <option value="{{ $value }}" @selected(in_array($value, (array) request('status_testimoni', []), true))>{{ $value }}</option>
+                    @endforeach
+                </select></div>
         </div>
         <div class="filter-actions"><button class="btn"><i class="fa-solid fa-filter"></i> Terapkan</button><a
                 class="btn-secondary" href="{{ route('all-data.index') }}">Reset</a></div>
@@ -38,7 +62,6 @@
         </div>
         <div class="stat-card"><span>Rentang data</span><strong>{{ request('from') ?: 'Semua' }} <small>hingga</small>
                 {{ request('to') ?: 'hari ini' }}</strong></div>
-        <div class="stat-card"><span>Kolom metrik</span><strong>18</strong></div>
     </div>
     <div class="table-wrap">
         <table class="data-table w-full" data-table>
@@ -80,6 +103,22 @@
                         <td colspan="18">Tidak ada data pada filter ini.</td>
                     </tr>
                 @endforelse
+                <tr class="total-row">
+                    <td colspan="5">TOTAL</td>
+                    <td>{{ number_format($totals['nilai100'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['ig_post'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['ig_view'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['ig_like'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['ig_komen'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['tt_post'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['tt_view'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['tt_like'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['tt_komen'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['wa_kirim'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['wa_terkirim'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['wa_dibaca'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($totals['wa_respon'], 0, ',', '.') }}</td>
+                </tr>
             </tbody>
         </table>
     </div>

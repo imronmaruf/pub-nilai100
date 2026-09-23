@@ -34,12 +34,16 @@
                 class="btn-secondary" href="{{ route('dashboard') }}">Reset</a></div>
     </form>
     <div class="stats-grid">
-        <div class="stat-card"><span>Unit
-                ditampilkan</span><strong>{{ number_format($rows->total(), 0, ',', '.') }}</strong>
+        <div class="stat-card"><span>Total unit</span><strong>{{ number_format($totals['units'], 0, ',', '.') }}</strong>
         </div>
-        <div class="stat-card"><span>Periode</span><strong>{{ request('from') ?: 'Semua' }} <small>hingga</small>
-                {{ request('to') ?: 'hari ini' }}</strong></div>
-        <div class="stat-card"><span>Data per halaman</span><strong>{{ $rows->count() }} <small>unit</small></strong></div>
+        <div class="stat-card"><span>Jumlah siswa Nilai
+                100</span><strong>{{ number_format($totals['nilai_100_students'], 0, ',', '.') }}</strong></div>
+        <div class="stat-card"><span>Sudah
+                testimoni</span><strong>{{ number_format($totals['testimoni'], 0, ',', '.') }}</strong></div>
+        <div class="stat-card"><span>Belum
+                testimoni</span><strong>{{ number_format($totals['belum_testimoni'], 0, ',', '.') }}</strong></div>
+        <div class="stat-card"><span>Sudah
+                publikasi</span><strong>{{ number_format($totals['dipublikasi'], 0, ',', '.') }}</strong></div>
     </div>
     <div class="table-wrap">
         <table class="data-table resume-table w-full" data-table>
@@ -84,6 +88,14 @@
                         <td colspan="21">Belum ada data pada filter ini.</td>
                     </tr>
                 @endforelse
+                <tr class="total-row">
+                    <td colspan="3">TOTAL</td>
+                    <td>{{ number_format($totals['jumsis'], 0, ',', '.') }}</td>
+                    @foreach (array_slice($fields, 3) as $field)
+                        <td>{{ in_array($field, ['kota', 'nama_unit']) ? '' : number_format($totals[$field] ?? 0, 0, ',', '.') }}
+                        </td>
+                    @endforeach
+                </tr>
             </tbody>
         </table>
     </div>
