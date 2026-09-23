@@ -11,8 +11,8 @@
         <div class="grid gap-4 sm:grid-cols-2">
             <div class="field"><label for="mapel" class="label">Mata pelajaran</label><select id="mapel" name="mapel"
                     required>
-                    @foreach (\App\Models\Nilai100::MAPEL as $v)
-                        <option value="{{ $v }}" @selected(old('mapel', $nilai->mapel) === $v)>{{ $v }}</option>
+                    @foreach ($mapels as $mapel)
+                        <option value="{{ $mapel->kode }}" @selected(old('mapel', $nilai->mapel) === $mapel->kode)>{{ $mapel->nama }}</option>
                     @endforeach
                 </select>
             </div>

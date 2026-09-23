@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Nilai100;
+use App\Models\Mapel;
 use App\Services\Access;
 use App\Http\Requests\NilaiRequest;
 use Illuminate\Http\Request;
@@ -41,14 +42,14 @@ class NilaiController extends Controller
   }
   public function create()
   {
-    return view('nilai.form', ['student' => null, 'nilai' => new Nilai100]);
+    return view('nilai.form', ['student' => null, 'nilai' => new Nilai100, 'mapels' => Mapel::orderBy('kode')->get()]);
   }
   public function edit(Request $r, string $student)
   {
     $s = $this->access->students($r->user())->with(['unit', 'nilai100'])->findOrFail($student);
     $nilai = $s->nilai100->sortByDesc('tanggal_ujian')->first();
     abort_unless($nilai, 404);
-    return view('nilai.form', ['student' => $s, 'nilai' => $nilai]);
+    return view('nilai.form', ['student' => $s, 'nilai' => $nilai, 'mapels' => Mapel::orderBy('kode')->get()]);
   }
   public function store(NilaiRequest $r)
   {

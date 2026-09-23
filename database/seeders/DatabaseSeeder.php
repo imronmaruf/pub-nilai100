@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
   {
     app(PermissionRegistrar::class)->forgetCachedPermissions();
     $this->call(UnitSeeder::class);
+    $this->call(MapelSeeder::class);
 
     $superadminRole = Role::findOrCreate('Superadmin', 'web');
     $adminRole = Role::findOrCreate('Admin Unit', 'web');

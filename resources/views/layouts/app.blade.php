@@ -40,6 +40,8 @@
                         <div class="sidebar-label">Superadmin</div><a
                             class="{{ request()->routeIs('units.*') ? 'active' : '' }}"
                             href="{{ route('units.index') }}"><i class="fa-solid fa-building"></i> Unit</a><a
+                            class="{{ request()->routeIs('mapels.*') ? 'active' : '' }}"
+                            href="{{ route('mapels.index') }}"><i class="fa-solid fa-book"></i> Mapel</a><a
                             class="{{ request()->routeIs('users.*') ? 'active' : '' }}"
                             href="{{ route('users.index') }}"><i class="fa-solid fa-users-gear"></i> Akun</a>
                     @endif
