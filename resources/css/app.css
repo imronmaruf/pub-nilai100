@@ -1,0 +1,268 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  body {
+    @apply bg-[#fafafa] text-zinc-950 antialiased;
+    font-family: "DM Sans", sans-serif;
+  }
+  input:not([type="hidden"]),
+  select,
+  textarea {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm;
+  }
+  input:focus,
+  select:focus {
+    @apply outline-none ring-2 ring-red-600;
+  }
+  input[readonly] {
+    @apply bg-slate-50 text-slate-600;
+  }
+  :disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+  th {
+    @apply whitespace-nowrap border-b border-slate-300 bg-slate-50 px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide;
+  }
+  td {
+    @apply border-b border-slate-200 px-3 py-3 align-top text-sm;
+  }
+}
+@layer components {
+  .app-shell {
+    @apply flex min-h-screen;
+  }
+  .sidebar {
+    @apply fixed inset-y-0 z-30 flex h-screen w-64 -translate-x-full flex-col bg-black px-4 py-5 text-white transition-transform lg:sticky lg:top-0 lg:translate-x-0;
+  }
+  .sidebar.open {
+    @apply translate-x-0;
+  }
+  .main-shell {
+    @apply min-w-0 flex-1;
+  }
+  .brand {
+    @apply mb-8 flex items-center gap-3 px-2;
+  }
+  .brand img {
+    @apply h-10 w-10 rounded-lg bg-white object-contain p-1;
+  }
+  .brand strong {
+    @apply block font-bold;
+  }
+  .brand span {
+    @apply block text-xs text-yellow-300;
+  }
+  .sidebar-label {
+    @apply mb-2 mt-6 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-yellow-300;
+  }
+  .side-nav {
+    @apply space-y-1;
+  }
+  .side-nav a {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-zinc-100 transition-colors;
+  }
+  .side-nav a:hover,
+  .side-nav a.active {
+    @apply bg-red-600 text-white;
+  }
+  .side-nav i {
+    @apply w-5 text-center text-yellow-300;
+  }
+  .sidebar-footer {
+    @apply mt-auto space-y-4 border-t border-zinc-800 pt-4;
+  }
+  .user-chip {
+    @apply flex items-center gap-2;
+  }
+  .user-chip > span {
+    @apply flex h-8 w-8 items-center justify-center rounded-full bg-yellow-300 font-bold text-black;
+  }
+  .user-chip strong,
+  .user-chip small {
+    @apply block truncate;
+  }
+  .user-chip strong {
+    @apply max-w-[145px] text-sm;
+  }
+  .user-chip small {
+    @apply text-xs text-yellow-200;
+  }
+  .logout {
+    @apply w-full rounded-lg px-3 py-2 text-left text-sm text-zinc-100 hover:bg-red-600;
+  }
+  .topbar {
+    @apply sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200 bg-white/95 px-5 backdrop-blur lg:px-8;
+  }
+  .topbar-title {
+    @apply font-semibold;
+  }
+  .topbar-date {
+    @apply ml-auto hidden text-sm text-slate-500 sm:block;
+  }
+  .icon-button {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white;
+  }
+  .menu-button {
+    @apply lg:hidden;
+  }
+  .content {
+    @apply mx-auto max-w-[1800px] p-5 lg:p-8;
+  }
+  .page-heading {
+    @apply mb-6 flex flex-wrap items-end justify-between gap-4;
+  }
+  .page-heading h1 {
+    @apply text-2xl font-extrabold tracking-tight;
+  }
+  .eyebrow {
+    @apply mb-1 text-xs font-bold uppercase tracking-[.15em] text-red-700;
+  }
+  .muted {
+    @apply mt-1 text-sm text-slate-500;
+  }
+  .filter-panel {
+    @apply mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm;
+  }
+  .filter-grid {
+    @apply grid gap-4 sm:grid-cols-2 lg:grid-cols-4;
+  }
+  .filter-actions {
+    @apply mt-4 flex gap-2 border-t border-slate-100 pt-4;
+  }
+  .stats-grid {
+    @apply mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3;
+  }
+  .stat-card {
+    @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
+  }
+  .stat-card span {
+    @apply text-xs font-bold uppercase tracking-wide text-slate-500;
+  }
+  .stat-card strong {
+    @apply mt-2 block text-2xl font-extrabold text-black;
+  }
+  .stat-card small {
+    @apply text-xs font-normal text-slate-400;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800;
+  }
+  .alert {
+    @apply mb-5 flex gap-3 rounded-lg border p-3 text-sm;
+  }
+  .alert-success {
+    @apply border-yellow-300 bg-yellow-50 text-zinc-900;
+  }
+  .alert-danger {
+    @apply border-red-200 bg-red-50 text-red-800;
+  }
+  .alert ul {
+    @apply list-inside list-disc;
+  }
+  .toolbar {
+    @apply mb-5 flex flex-wrap items-center justify-between gap-3;
+  }
+  .field {
+    @apply space-y-1;
+  }
+  .label {
+    @apply block text-sm font-medium;
+  }
+  .table-wrap {
+    @apply max-h-[68vh] overflow-auto rounded-xl border border-slate-200 bg-white shadow-sm;
+  }
+  .data-table tbody tr:hover {
+    @apply bg-red-50/60;
+  }
+  .data-table th {
+    background: #fef08a;
+  }
+  .pagination {
+    @apply mt-4;
+  }
+  .link {
+    @apply text-red-700 underline underline-offset-2;
+  }
+  .danger {
+    @apply text-red-700 underline underline-offset-2;
+  }
+  .select2-container {
+    width: 100% !important;
+  }
+  .select2-container--default .select2-selection--single {
+    @apply h-[42px] rounded-lg border border-slate-300 bg-white;
+  }
+  .select2-container--default
+    .select2-selection--single
+    .select2-selection__rendered {
+    @apply px-1 py-1.5 text-sm text-zinc-900;
+  }
+  .select2-container--default
+    .select2-selection--single
+    .select2-selection__arrow {
+    @apply top-1.5;
+  }
+  .select2-container--default.select2-container--focus
+    .select2-selection--single {
+    @apply border-red-600 ring-2 ring-red-600;
+  }
+  .select2-dropdown {
+    @apply overflow-hidden rounded-lg border border-zinc-200 shadow-lg;
+  }
+  .select2-container--default
+    .select2-results__option--highlighted[aria-selected] {
+    @apply bg-red-600;
+  }
+  .data-table {
+    @apply border-separate border-spacing-0;
+  }
+  .data-table thead th {
+    @apply sticky top-0 z-10 border-b border-zinc-300 bg-yellow-300 text-zinc-950;
+  }
+  .data-table thead tr:first-child th {
+    @apply top-0;
+  }
+  .data-table thead tr:nth-child(2) th {
+    top: 42px;
+  }
+  .resume-table {
+    min-width: 1320px;
+  }
+  .resume-table .group-base {
+    background: #fef08a;
+  }
+  .resume-table .group-ig {
+    background: #ef4444;
+    color: white;
+  }
+  .resume-table .group-tt {
+    background: #18181b;
+    color: white;
+  }
+  .resume-table .group-wa {
+    background: #07f04d;
+    color: #18181b;
+  }
+  .resume-table .metric-head {
+    background: #fff4a3;
+  }
+  .data-table tbody tr:nth-child(even) {
+    @apply bg-zinc-50;
+  }
+  .resume-number {
+    @apply font-semibold text-red-700 underline decoration-dotted underline-offset-4 hover:text-black;
+  }
+  .status-badge {
+    @apply inline-flex min-w-16 items-center justify-center rounded-full px-2.5 py-1 text-xs font-bold;
+  }
+  .status-done {
+    @apply bg-yellow-300 text-black;
+  }
+  .status-pending {
+    @apply bg-red-100 text-red-700;
+  }
+}

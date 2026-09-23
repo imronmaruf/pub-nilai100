@@ -1,0 +1,1 @@
+<nav aria-label="Kanal publikasi" class="mb-5 flex gap-2">@foreach(['ig'=>'Instagram','tiktok'=>'TikTok','wa'=>'WhatsApp'] as $key=>$label)<a class="{{ $channel===$key?'btn':'btn-secondary' }}" href="{{ route('publications.index',$key) }}">{{ $label }}</a>@endforeach</nav>
