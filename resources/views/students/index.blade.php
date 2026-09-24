@@ -10,56 +10,49 @@
         <div class="filter-grid">
             <div class="field"><label class="label" for="q">Cari siswa</label><input id="q" name="q"
                     value="{{ request('q') }}" placeholder="Noreg atau nama" maxlength="100"></div>
-            <div class="field"><label class="label" for="kota">Kota</label><select id="kota" name="kota">
-                    <option value="">Semua kota</option>
+            <div class="field"><label class="label" for="kota">Kota</label><select id="kota" name="kota[]" multiple data-filter-select>
                     @foreach ($cities as $city)
-                        <option value="{{ $city }}" @selected(request('kota') === $city)>{{ $city }}</option>
+                        <option value="{{ $city }}" @selected(in_array($city, (array) request('kota', []), true))>{{ $city }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="field"><label class="label" for="unit_id">Unit</label><select id="unit_id" name="unit_id">
-                    <option value="">Semua unit</option>
+            <div class="field"><label class="label" for="unit_id">Unit</label><select id="unit_id" name="unit_id[]" multiple data-filter-select>
                     @foreach ($units as $unit)
-                        <option value="{{ $unit->id }}" @selected((string) request('unit_id') === (string) $unit->id)>{{ $unit->nama_unit }}</option>
+                        <option value="{{ $unit->id }}" @selected(in_array($unit->id, array_map('intval', (array) request('unit_id', [])), true))>{{ $unit->nama_unit }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="field"><label class="label" for="asal_sekolah">Asal sekolah</label><select id="asal_sekolah"
-                    name="asal_sekolah">
-                    <option value="">Semua sekolah</option>
+                    name="asal_sekolah[]" multiple data-filter-select>
                     @foreach ($schools as $school)
-                        <option value="{{ $school }}" @selected(request('asal_sekolah') === $school)>{{ $school }}</option>
+                        <option value="{{ $school }}" @selected(in_array($school, (array) request('asal_sekolah', []), true))>{{ $school }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="field"><label class="label" for="kelas_di_go">Kelas di GO</label><select id="kelas_di_go"
-                    name="kelas_di_go">
-                    <option value="">Semua kelas GO</option>
+                    name="kelas_di_go[]" multiple data-filter-select>
                     @foreach ($goClasses as $class)
-                        <option value="{{ $class }}" @selected(request('kelas_di_go') === $class)>{{ $class }}</option>
+                        <option value="{{ $class }}" @selected(in_array($class, (array) request('kelas_di_go', []), true))>{{ $class }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="field"><label class="label" for="tingkat_kelas">Tingkat kelas</label><select id="tingkat_kelas"
-                    name="tingkat_kelas">
-                    <option value="">Semua tingkat</option>
+                    name="tingkat_kelas[]" multiple data-filter-select>
                     @foreach ($grades as $grade)
-                        <option value="{{ $grade }}" @selected(request('tingkat_kelas') === $grade)>{{ $grade }}</option>
+                        <option value="{{ $grade }}" @selected(in_array($grade, (array) request('tingkat_kelas', []), true))>{{ $grade }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="field"><label class="label" for="level">Level</label><select id="level" name="level">
-                    <option value="">Semua level</option>
+            <div class="field"><label class="label" for="level">Level</label><select id="level" name="level[]" multiple data-filter-select>
                     @foreach (['SD', 'SMP', 'SMA'] as $level)
-                        <option value="{{ $level }}" @selected(request('level') === $level)>{{ $level }}</option>
+                        <option value="{{ $level }}" @selected(in_array($level, (array) request('level', []), true))>{{ $level }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="field"><label class="label" for="nilai_status">Status Nilai 100</label><select id="nilai_status"
-                    name="nilai_status">
-                    <option value="">Semua status</option>
-                    <option value="sudah" @selected(request('nilai_status') === 'sudah')>Sudah - memiliki nilai</option>
-                    <option value="belum" @selected(request('nilai_status') === 'belum')>Belum - belum memiliki nilai</option>
+                    name="nilai_status[]" multiple data-filter-select>
+                    <option value="sudah" @selected(in_array('sudah', (array) request('nilai_status', []), true))>Sudah - memiliki nilai</option>
+                    <option value="belum" @selected(in_array('belum', (array) request('nilai_status', []), true))>Belum - belum memiliki nilai</option>
                 </select>
             </div>
         </div>
@@ -70,7 +63,9 @@
             class="muted">{{ number_format($students->total(), 0, ',', '.') }} siswa ditemukan</span>
         <form method="GET" class="flex items-center gap-2">
             @foreach (request()->except('per_page', 'page') as $key => $value)
-                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @foreach ((array) $value as $item)
+                    <input type="hidden" name="{{ is_array($value) ? $key . '[]' : $key }}" value="{{ $item }}">
+                @endforeach
             @endforeach
             <label class="text-sm" for="per_page">Tampilkan</label><select id="per_page" name="per_page" class="!w-auto"
                 onchange="this.form.submit()">

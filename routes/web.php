@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AuthController, StudentController, NilaiController, PublicationController, DashboardController, AllDataController, UnitController, UserController};
+use App\Http\Controllers\{AuthController, StudentController, NilaiController, PublicationController, DashboardController, AllDataController, UnitController, UserController, MapelController};
 
 Route::middleware('guest')->group(function () {
   Route::get('/login', [AuthController::class, 'create'])->name('login');
@@ -40,6 +40,7 @@ Route::middleware(['auth', 'account'])->group(function () {
   });
   Route::middleware('superadmin')->group(function () {
     Route::resource('units', UnitController::class)->except(['create', 'show']);
+    Route::resource('mapels', MapelController::class)->except(['create', 'show']);
     Route::resource('users', UserController::class)->except('show');
   });
 });

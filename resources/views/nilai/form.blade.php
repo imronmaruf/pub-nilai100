@@ -11,8 +11,8 @@
         <div class="grid gap-4 sm:grid-cols-2">
             <div class="field"><label for="mapel" class="label">Mata pelajaran</label><select id="mapel" name="mapel"
                     required>
-                    @foreach (\App\Models\Nilai100::MAPEL as $v)
-                        <option value="{{ $v }}" @selected(old('mapel', $nilai->mapel) === $v)>{{ $v }}</option>
+                    @foreach ($mapels as $mapel)
+                        <option value="{{ $mapel->kode }}" @selected(old('mapel', $nilai->mapel) === $mapel->kode)>{{ $mapel->nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -33,6 +33,10 @@
                 required />
             <x-field name="tanggal_validasi_pt" label="Tanggal validasi PT" type="date" :value="$nilai->tanggal_validasi_pt?->format('Y-m-d')"
                 :max="today()->format('Y-m-d')" required />
+            <div class="field sm:col-span-2"><label for="keterangan" class="label">Keterangan</label>
+                <textarea id="keterangan" name="keterangan" rows="3" maxlength="1000"
+                    placeholder="Keterangan tambahan (opsional)">{{ old('keterangan', $nilai->keterangan) }}</textarea>
+            </div>
         </div><button class="btn">Simpan</button><a class="btn-secondary" href="{{ route('nilai.index') }}">Batal</a>
     </form>
 @endsection

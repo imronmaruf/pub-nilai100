@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Services\Access;
+use App\Models\Mapel;
 
 class NilaiRequest extends FormRequest
 {
@@ -18,7 +19,7 @@ class NilaiRequest extends FormRequest
     if ($id) app(Access::class)->students($this->user())->findOrFail($id);
     return [
       'student_id' => [$id ? 'prohibited' : 'required', 'integer'],
-      'mapel' => ['required', Rule::in(\App\Models\Nilai100::MAPEL)],
+      'mapel' => ['required', Rule::in(Mapel::pluck('kode')->all())],
       'jenis_nilai' => ['required', Rule::in(['UH', 'PTS', 'PAS', 'PAT', 'US'])],
       'tanggal_ujian' => 'required|date_format:Y-m-d|before_or_equal:today',
       'tanggal_validasi_pt' => 'required|date_format:Y-m-d|after_or_equal:tanggal_ujian|before_or_equal:today',

@@ -100,7 +100,7 @@ document.querySelectorAll("table[data-table]").forEach((table) => {
     header.setAttribute("title", "Urutkan kolom");
     header.addEventListener("click", () => {
       const body = table.tBodies[0];
-      const rows = [...body.rows];
+      const rows = [...body.rows].filter((row) => !row.classList.contains("total-row"));
       const direction = header.dataset.direction === "asc" ? -1 : 1;
       table
         .querySelectorAll("thead th")

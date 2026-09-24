@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Nilai100;
+use App\Models\Mapel;
 use App\Services\Access;
 use App\Http\Requests\NilaiRequest;
 use Illuminate\Http\Request;
@@ -17,13 +18,22 @@ class NilaiController extends Controller
   public function __construct(private Access $access) {}
   public function index(Request $r)
   {
-    $rows = $this->access->records(Nilai100::class, $r->user())->with('student.unit')
-      ->when($r->filled('unit_id'), fn($q) => $q->whereHas('student', fn($s) => $s->where('unit_id', $r->input('unit_id'))))
-      ->when($r->filled('status_testimoni'), fn($q) => $q->where('status_testimoni', $r->input('status_testimoni')))
+    foreach (['kota', 'unit_id', 'mapel', 'jenis_nilai', 'status_testimoni'] as $key) if ($r->filled($key) && !is_array($r->input($key))) $r->merge([$key => [$r->input($key)]]);
+    $filters = $r->validate(['kota' => 'nullable|array', 'kota.*' => 'string', 'unit_id' => 'nullable|array', 'unit_id.*' => 'integer', 'mapel' => 'nullable|array', 'mapel.*' => 'string', 'jenis_nilai' => 'nullable|array', 'jenis_nilai.*' => 'in:UH,PTS,PAS,PAT,US', 'status_testimoni' => 'nullable|array', 'status_testimoni.*' => 'in:SUDAH,BELUM', 'from' => 'nullable|date', 'to' => 'nullable|date', 'per_page' => 'nullable|in:10,20,30']);
+    $base = $this->access->records(Nilai100::class, $r->user())->with('student.unit');
+    $query = (clone $base)
+      ->when($r->filled('unit_id'), fn($q) => $q->whereHas('student', fn($s) => $s->whereIn('unit_id', $r->input('unit_id'))))
+      ->when($r->filled('kota'), fn($q) => $q->whereHas('student.unit', fn($u) => $u->whereIn('kota', $r->input('kota'))))
+      ->when($r->filled('mapel'), fn($q) => $q->whereIn('mapel', $r->input('mapel')))
+      ->when($r->filled('jenis_nilai'), fn($q) => $q->whereIn('jenis_nilai', $r->input('jenis_nilai')))
+      ->when($r->filled('status_testimoni'), fn($q) => $q->whereIn('status_testimoni', $r->input('status_testimoni')))
       ->when($r->filled('from'), fn($q) => $q->whereDate('tanggal_ujian', '>=', $r->input('from')))
       ->when($r->filled('to'), fn($q) => $q->whereDate('tanggal_ujian', '<=', $r->input('to')))
-      ->latest()->paginate($r->integer('per_page') && in_array($r->integer('per_page'), [10, 20, 30], true) ? $r->integer('per_page') : 10)->withQueryString();
-    return view('nilai.index', compact('rows'));
+      ->latest();
+    $summary = (clone $query)->reorder()->selectRaw("COUNT(DISTINCT student_id) as unique_students, COUNT(*) as total_values, COUNT(DISTINCT CASE WHEN status_testimoni = 'SUDAH' THEN student_id END) as testified, COUNT(DISTINCT CASE WHEN status_testimoni = 'BELUM' THEN student_id END) as pending")->first();
+    $rows = $query->paginate($r->integer('per_page') && in_array($r->integer('per_page'), [10, 20, 30], true) ? $r->integer('per_page') : 10)->withQueryString();
+    $units = $this->access->units($r->user())->orderBy('nama_unit')->get();
+    return view('nilai.index', ['rows' => $rows, 'summary' => $summary, 'units' => $units, 'cities' => $units->pluck('kota')->unique()->sort()->values(), 'mapels' => Mapel::orderBy('kode')->get()]);
   }
   public function importForm()
   {
@@ -41,14 +51,14 @@ class NilaiController extends Controller
   }
   public function create()
   {
-    return view('nilai.form', ['student' => null, 'nilai' => new Nilai100]);
+    return view('nilai.form', ['student' => null, 'nilai' => new Nilai100, 'mapels' => Mapel::orderBy('kode')->get()]);
   }
   public function edit(Request $r, string $student)
   {
     $s = $this->access->students($r->user())->with(['unit', 'nilai100'])->findOrFail($student);
     $nilai = $s->nilai100->sortByDesc('tanggal_ujian')->first();
     abort_unless($nilai, 404);
-    return view('nilai.form', ['student' => $s, 'nilai' => $nilai]);
+    return view('nilai.form', ['student' => $s, 'nilai' => $nilai, 'mapels' => Mapel::orderBy('kode')->get()]);
   }
   public function store(NilaiRequest $r)
   {
