@@ -28,6 +28,9 @@
                 <nav class="side-nav" aria-label="Navigasi utama">
                     <a class="{{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}"><i
                             class="fa-solid fa-chart-pie"></i> Resume</a><a
+                        class="sub {{ request()->routeIs('dashboard.pertambahan') ? 'active' : '' }}"
+                        href="{{ route('dashboard.pertambahan') }}"><i
+                            class="fa-solid fa-arrow-trend-up"></i> Pertambahan per Periode</a><a
                         class="{{ request()->routeIs('all-data.*') ? 'active' : '' }}"
                         href="{{ route('all-data.index') }}"><i class="fa-solid fa-table-list"></i> All Data</a><a
                         class="{{ request()->routeIs('students.*') ? 'active' : '' }}"

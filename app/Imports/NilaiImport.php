@@ -27,7 +27,7 @@ class NilaiImport implements ToCollection
       $data = ['student_id' => $student?->id, 'mapel' => strtoupper(trim((string)($row[1] ?? ''))), 'jenis_nilai' => strtoupper(trim((string)($row[2] ?? ''))), 'tanggal_ujian' => ImportDate::normalize($row[3] ?? null), 'tanggal_validasi_pt' => ImportDate::normalize($row[4] ?? null), 'status_testimoni' => strtoupper(trim((string)($row[5] ?? ''))), 'keterangan' => trim((string)($row[6] ?? '')) ?: null];
       $v = Validator::make($data, ['student_id' => 'required', 'mapel' => ['required', Rule::in(Mapel::pluck('kode')->all())], 'jenis_nilai' => 'required|in:UH,PTS,PAS,PAT,US', 'tanggal_ujian' => 'nullable|date_format:Y-m-d|before_or_equal:today', 'tanggal_validasi_pt' => 'nullable|date_format:Y-m-d|after_or_equal:tanggal_ujian|before_or_equal:today', 'status_testimoni' => 'required|in:SUDAH,BELUM', 'keterangan' => 'nullable|string|max:1000']);
       if ($v->fails()) throw ValidationException::withMessages(['file' => 'Baris ' . ($i + 2) . ': ' . implode(' ', $v->errors()->all())]);
-      $records[] = $data;
+      $records[] = Nilai100::withValidasiNote($data);
     }
     if (!$records) throw ValidationException::withMessages(['file' => 'Tidak ada baris data.']);
     foreach ($records as $data) Nilai100::create($data);

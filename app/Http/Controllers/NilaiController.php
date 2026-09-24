@@ -76,7 +76,7 @@ class NilaiController extends Controller
       if ($id) abort_unless($n, 404);
       if (!$id && $s->nilai100()->where('mapel', $r->validated('mapel'))->where('jenis_nilai', $r->validated('jenis_nilai'))->whereDate('tanggal_ujian', $r->validated('tanggal_ujian'))->exists()) throw ValidationException::withMessages(['student_id' => 'Nilai dengan mapel, jenis, dan tanggal tersebut sudah ada.']);
       if ($r->validated('status_testimoni') === 'BELUM' && $s->hasPublications()) throw ValidationException::withMessages(['status_testimoni' => 'Hapus catatan publikasi sebelum mengubah testimoni menjadi BELUM.']);
-      $data = $r->safe()->except('student_id');
+      $data = Nilai100::withValidasiNote($r->safe()->except('student_id')->all());
       if ($n && $id) $n->update($data);
       else $s->nilai100()->create($data);
     });

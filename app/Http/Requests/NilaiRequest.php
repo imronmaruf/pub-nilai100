@@ -22,8 +22,9 @@ class NilaiRequest extends FormRequest
       'mapel' => ['required', Rule::in(Mapel::pluck('kode')->all())],
       'jenis_nilai' => ['required', Rule::in(['UH', 'PTS', 'PAS', 'PAT', 'US'])],
       'tanggal_ujian' => 'required|date_format:Y-m-d|before_or_equal:today',
-      'tanggal_validasi_pt' => 'required|date_format:Y-m-d|after_or_equal:tanggal_ujian|before_or_equal:today',
-      'status_testimoni' => ['required', Rule::in(['SUDAH', 'BELUM'])]
+      'tanggal_validasi_pt' => 'nullable|date_format:Y-m-d|after_or_equal:tanggal_ujian|before_or_equal:today',
+      'status_testimoni' => ['required', Rule::in(['SUDAH', 'BELUM'])],
+      'keterangan' => 'nullable|string|max:1000'
     ];
   }
   public function after(): array

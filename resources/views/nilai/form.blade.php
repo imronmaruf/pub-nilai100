@@ -32,7 +32,7 @@
             <x-field name="tanggal_ujian" label="Tanggal ujian" type="date" :value="$nilai->tanggal_ujian?->format('Y-m-d')" :max="today()->format('Y-m-d')"
                 required />
             <x-field name="tanggal_validasi_pt" label="Tanggal validasi PT" type="date" :value="$nilai->tanggal_validasi_pt?->format('Y-m-d')"
-                :max="today()->format('Y-m-d')" required />
+                :max="today()->format('Y-m-d')" placeholder="-" /><p class="muted text-xs">Boleh kosong. Bila kosong, keterangan otomatis diberi catatan “cek tanggal validasi pt”.</p>
             <div class="field sm:col-span-2"><label for="keterangan" class="label">Keterangan</label>
                 <textarea id="keterangan" name="keterangan" rows="3" maxlength="1000"
                     placeholder="Keterangan tambahan (opsional)">{{ old('keterangan', $nilai->keterangan) }}</textarea>

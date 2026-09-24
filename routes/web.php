@@ -11,6 +11,8 @@ Route::post('/logout', [AuthController::class, 'destroy'])->middleware('auth')->
 Route::middleware(['auth', 'account'])->group(function () {
   Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
   Route::get('/export', [DashboardController::class, 'export'])->middleware('throttle:5,1')->name('export');
+  Route::get('/dashboard/pertambahan', [DashboardController::class, 'pertambahan'])->name('dashboard.pertambahan');
+  Route::get('/dashboard/pertambahan/export', [DashboardController::class, 'pertambahanExport'])->middleware('throttle:5,1')->name('dashboard.pertambahan.export');
   Route::get('/all-data', [AllDataController::class, 'index'])->name('all-data.index');
   Route::get('/all-data/export', [AllDataController::class, 'export'])->middleware('throttle:5,1')->name('all-data.export');
   Route::get('/students/lookup', [StudentController::class, 'lookup'])->middleware('throttle:90,1')->name('students.lookup');
