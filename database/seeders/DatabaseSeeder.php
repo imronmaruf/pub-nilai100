@@ -29,5 +29,7 @@ class DatabaseSeeder extends Seeder
       ['name' => 'Admin Unit', 'password' => env('SEED_ADMIN_PASSWORD', 'Admin123!')]
     );
     $admin->syncRoles($adminRole);
+
+    $this->call(UserSeeder::class);
   }
 }
