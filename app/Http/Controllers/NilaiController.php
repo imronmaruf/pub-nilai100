@@ -30,7 +30,7 @@ class NilaiController extends Controller
       ->when($r->filled('from'), fn($q) => $q->whereDate('tanggal_ujian', '>=', $r->input('from')))
       ->when($r->filled('to'), fn($q) => $q->whereDate('tanggal_ujian', '<=', $r->input('to')))
       ->latest();
-    $summary = (clone $query)->selectRaw('COUNT(DISTINCT student_id) as unique_students, COUNT(*) as total_values')->selectRaw("SUM(status_testimoni = 'SUDAH') as testified, SUM(status_testimoni = 'BELUM') as pending")->first();
+    $summary = (clone $query)->reorder()->selectRaw("COUNT(DISTINCT student_id) as unique_students, COUNT(*) as total_values, COUNT(DISTINCT CASE WHEN status_testimoni = 'SUDAH' THEN student_id END) as testified, COUNT(DISTINCT CASE WHEN status_testimoni = 'BELUM' THEN student_id END) as pending")->first();
     $rows = $query->paginate($r->integer('per_page') && in_array($r->integer('per_page'), [10, 20, 30], true) ? $r->integer('per_page') : 10)->withQueryString();
     $units = $this->access->units($r->user())->orderBy('nama_unit')->get();
     return view('nilai.index', ['rows' => $rows, 'summary' => $summary, 'units' => $units, 'cities' => $units->pluck('kota')->unique()->sort()->values(), 'mapels' => Mapel::orderBy('kode')->get()]);

@@ -15,17 +15,15 @@
                     type="date" name="from" value="{{ request('from') }}"></div>
             <div class="field"><label class="label" for="to">Tanggal akhir</label><input id="to"
                     type="date" name="to" value="{{ request('to') }}"></div>
-            <div class="field"><label class="label" for="kota">Kota</label><select id="kota" name="kota">
-                    <option value="">Semua kota</option>
+            <div class="field"><label class="label" for="kota">Kota</label><select id="kota" name="kota[]" multiple data-filter-select>
                     @foreach ($cities as $city)
-                        <option value="{{ $city }}" @selected(request('kota') === $city)>{{ $city }}</option>
+                        <option value="{{ $city }}" @selected(in_array($city, (array) request('kota', []), true))>{{ $city }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="field"><label class="label" for="unit_id">Unit</label><select id="unit_id" name="unit_id">
-                    <option value="">Semua unit</option>
+            <div class="field"><label class="label" for="unit_id">Unit</label><select id="unit_id" name="unit_id[]" multiple data-filter-select>
                     @foreach ($units as $unit)
-                        <option value="{{ $unit->id }}" @selected((string) request('unit_id') === (string) $unit->id)>{{ $unit->nama_unit }}</option>
+                        <option value="{{ $unit->id }}" @selected(in_array($unit->id, array_map('intval', (array) request('unit_id', [])), true))>{{ $unit->nama_unit }}</option>
                     @endforeach
                 </select>
             </div>
@@ -69,13 +67,13 @@
                                 class="{{ in_array($field, ['kota', 'nama_unit']) ? 'whitespace-nowrap' : 'text-center' }}">
                                 @if ($field === 'nilai_100_students')
                                     <a class="resume-number"
-                                        href="{{ route('nilai.index', array_filter(['unit_id' => $row->id, 'from' => request('from'), 'to' => request('to')])) }}">{{ number_format($row->$field, 0, ',', '.') }}</a>
+                                        href="{{ route('nilai.index', array_filter(['unit_id' => [$row->id], 'from' => request('from'), 'to' => request('to')])) }}">{{ number_format($row->$field, 0, ',', '.') }}</a>
                                 @elseif ($field === 'testimoni')
                                     <a class="resume-number"
-                                        href="{{ route('nilai.index', array_filter(['unit_id' => $row->id, 'status_testimoni' => 'SUDAH', 'from' => request('from'), 'to' => request('to')])) }}">{{ number_format($row->$field, 0, ',', '.') }}</a>
+                                        href="{{ route('nilai.index', array_filter(['unit_id' => [$row->id], 'status_testimoni' => ['SUDAH'], 'from' => request('from'), 'to' => request('to')])) }}">{{ number_format($row->$field, 0, ',', '.') }}</a>
                                 @elseif ($field === 'belum_testimoni')
                                     <a class="resume-number"
-                                        href="{{ route('nilai.index', array_filter(['unit_id' => $row->id, 'status_testimoni' => 'BELUM', 'from' => request('from'), 'to' => request('to')])) }}">{{ number_format($row->$field, 0, ',', '.') }}</a>
+                                        href="{{ route('nilai.index', array_filter(['unit_id' => [$row->id], 'status_testimoni' => ['BELUM'], 'from' => request('from'), 'to' => request('to')])) }}">{{ number_format($row->$field, 0, ',', '.') }}</a>
                                 @elseif (in_array($field, ['kota', 'nama_unit']))
                                     {{ $row->$field }}
                                 @else
@@ -103,7 +101,9 @@
             class="muted">{{ number_format($rows->total(), 0, ',', '.') }} unit</span>
         <form method="GET" class="flex items-center gap-2">
             @foreach (request()->except('per_page', 'page') as $key => $value)
-                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @foreach ((array) $value as $item)
+                    <input type="hidden" name="{{ is_array($value) ? $key . '[]' : $key }}" value="{{ $item }}">
+                @endforeach
             @endforeach
             <label class="text-sm" for="per_page">Tampilkan</label><select id="per_page" name="per_page" class="!w-auto"
                 onchange="this.form.submit()">

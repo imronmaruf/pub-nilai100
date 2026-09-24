@@ -95,7 +95,13 @@
     <div class="mt-4 flex items-center justify-between"><span
             class="muted">{{ number_format($rows->total(), 0, ',', '.') }}
             data</span>
-        <form method="GET" class="flex items-center gap-2"><label class="text-sm" for="per_page">Tampilkan</label><select
+        <form method="GET" class="flex items-center gap-2">
+            @foreach (request()->except('per_page', 'page') as $key => $value)
+                @foreach ((array) $value as $item)
+                    <input type="hidden" name="{{ is_array($value) ? $key . '[]' : $key }}" value="{{ $item }}">
+                @endforeach
+            @endforeach
+            <label class="text-sm" for="per_page">Tampilkan</label><select
                 id="per_page" name="per_page" class="!w-auto" onchange="this.form.submit()">
                 <option value="10" @selected(request('per_page', 10) == 10)>10</option>
                 <option value="20" @selected(request('per_page') == 20)>20</option>

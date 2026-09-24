@@ -17,7 +17,6 @@
                     type="date" name="to" value="{{ request('to') }}"></div>
             <div class="field"><label class="label" for="kota">Kota</label><select id="kota" name="kota[]"
                     multiple data-filter-select>
-                    <option value="">Semua kota</option>
                     @foreach ($cities as $city)
                         <option value="{{ $city }}" @selected(in_array($city, (array) request('kota', []), true))>{{ $city }}</option>
                     @endforeach
@@ -25,7 +24,6 @@
             </div>
             <div class="field"><label class="label" for="unit_id">Unit</label><select id="unit_id" name="unit_id[]"
                     multiple data-filter-select>
-                    <option value="">Semua unit</option>
                     @foreach ($units as $unit)
                         <option value="{{ $unit->id }}" @selected(in_array($unit->id, array_map('intval', (array) request('unit_id', [])), true))>{{ $unit->nama_unit }}</option>
                     @endforeach
@@ -126,7 +124,9 @@
             class="muted">{{ number_format($rows->total(), 0, ',', '.') }} siswa</span>
         <form method="GET" class="flex items-center gap-2">
             @foreach (request()->except('per_page', 'page') as $key => $value)
-                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @foreach ((array) $value as $item)
+                    <input type="hidden" name="{{ is_array($value) ? $key . '[]' : $key }}" value="{{ $item }}">
+                @endforeach
             @endforeach
             <label class="text-sm" for="per_page">Tampilkan</label><select id="per_page" name="per_page" class="!w-auto"
                 onchange="this.form.submit()">
