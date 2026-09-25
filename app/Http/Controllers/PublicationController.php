@@ -6,7 +6,7 @@ use App\Services\{Access, PublicationService};
 use App\Http\Requests\PublicationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Imports\PublicationImport;
+use App\Imports\PublicationWorkbook;
 use App\Exports\ActivityTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -21,7 +21,13 @@ class PublicationController extends Controller
   }
   public function importForm(string $channel){$this->service->model($channel);return view('publications.import',compact('channel'));}
   public function template(string $channel){$this->service->model($channel);return Excel::download(new ActivityTemplateExport($channel),'template_import_'.$channel.'.xlsx');}
-  public function import(Request $r,string $channel){$this->service->model($channel);$r->validate(['file'=>'required|file|mimes:xlsx|max:5120']);DB::transaction(fn()=>Excel::import(new PublicationImport($r->user(),$channel),$r->file('file')));return to_route('publications.index',$channel)->with('status','Import publikasi selesai.');}
+  public function import(Request $r, string $channel)
+  {
+    $this->service->model($channel);
+    $r->validate(['file' => 'required|file|mimes:xlsx|max:5120']);
+    DB::transaction(fn() => Excel::import(new PublicationWorkbook($r->user(), $channel), $r->file('file')));
+    return to_route('publications.index', $channel)->with('status', 'Import publikasi selesai.');
+  }
   public function create(string $channel)
   {
     $model = $this->service->model($channel);

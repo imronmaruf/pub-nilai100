@@ -7,7 +7,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 use App\Models\{User,Unit,Student,Nilai100,PublikasiIg,PublikasiTiktok,PublikasiWa};
 use App\Services\ResumeService;
-use App\Exports\{ReportExport,ResumeSheet,StudentSheet,AllDataSheet};
+use App\Exports\{ReportExport,ResumeSheet,StudentSheet,AllDataSheet,ActivityTemplateExport};
 use App\Imports\StudentsImport;
 use Database\Seeders\DatabaseSeeder;
 use Maatwebsite\Excel\Facades\Excel;
@@ -17,7 +17,7 @@ class SystemTest extends TestCase {
  private Unit $a;private Unit $b;private User $admin;private User $root;private Student $own;private Student $other;
  protected function setUp():void {
   parent::setUp();$this->seed(DatabaseSeeder::class);
-  Unit::query()->delete();$this->a=Unit::create(['id'=>900001,'kota'=>'Kota A','nama_unit'=>'Unit A']);$this->b=Unit::create(['id'=>900002,'kota'=>'Kota B','nama_unit'=>'Unit B']);
+  User::query()->update(['unit_id'=>null]);Unit::query()->delete();$this->a=Unit::create(['id'=>900001,'kota'=>'Kota A','nama_unit'=>'Unit A']);$this->b=Unit::create(['id'=>900002,'kota'=>'Kota B','nama_unit'=>'Unit B']);
   $this->admin=User::create(['name'=>'Admin','email'=>'admin@example.test','password'=>'long-password','unit_id'=>$this->a->id]);$this->admin->assignRole('Admin Unit');
   $this->root=User::create(['name'=>'Root','email'=>'root@example.test','password'=>'long-password']);$this->root->assignRole('Superadmin');
   $this->own=$this->student($this->a,'0001');$this->other=$this->student($this->b,'0002');
@@ -97,8 +97,37 @@ class SystemTest extends TestCase {
  }
  public function test_real_xlsx_upload_preserves_leading_zero_noreg():void {
   $book=new Spreadsheet;$sheet=$book->getActiveSheet();$sheet->fromArray([['Noreg','Nama','Asal Sekolah','Tingkat Kelas','Kelas di GO','Level','Unit'],['','Imported','School','12','12','SMA',(string)$this->a->id]]);$sheet->setCellValueExplicit('A2','000010',\PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+  $book->createSheet()->setTitle('Referensi');
   $path=tempnam(sys_get_temp_dir(),'import').'.xlsx';(new Xlsx($book))->save($path);
    try{$response=$this->actingAs($this->admin)->post('/students/import',['file'=>new UploadedFile($path,'students.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',null,true)]);$response->assertSessionHasNoErrors();$this->assertDatabaseHas('students',['noreg'=>'000010','unit_id'=>$this->a->id]);}finally{if(file_exists($path))unlink($path);}
+ }
+ public function test_nilai_template_with_guide_sheet_imports_successfully():void {
+  $path=tempnam(sys_get_temp_dir(),'nilai').'.xlsx';
+  file_put_contents($path,Excel::raw(new ActivityTemplateExport('nilai'),\Maatwebsite\Excel\Excel::XLSX));
+  $book=IOFactory::load($path);
+  $sheet=$book->getSheet(0);
+  $sheet->fromArray([['0001','MAT','UH','01/01/2026','02/01/2026','SUDAH','ok']],null,'A2');
+  (new Xlsx($book))->save($path);
+  try{
+    $this->actingAs($this->admin)->post('/nilai/import',['file'=>new UploadedFile($path,'template_import_nilai_100.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',null,true)])->assertSessionHasNoErrors();
+    $this->assertDatabaseHas('nilai_100',['student_id'=>$this->own->id,'mapel'=>'MAT','jenis_nilai'=>'UH','status_testimoni'=>'SUDAH']);
+  }finally{if(file_exists($path))unlink($path);}
+ }
+ public function test_publication_template_with_guide_sheet_imports_successfully():void {
+  $this->grade($this->own);
+  $path=tempnam(sys_get_temp_dir(),'ig').'.xlsx';
+  file_put_contents($path,Excel::raw(new ActivityTemplateExport('ig'),\Maatwebsite\Excel\Excel::XLSX));
+  $book=IOFactory::load($path);
+  $book->getSheet(0)->fromArray([['0001','SUDAH',2,'03/01/2026','https://instagram.com/p/example',10,3,1]],null,'A2');
+  (new Xlsx($book))->save($path);
+  try{
+    $this->actingAs($this->admin)->post('/publications/ig/import',['file'=>new UploadedFile($path,'template_import_ig.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',null,true)])->assertSessionHasNoErrors();
+    $this->assertDatabaseHas('publikasi_ig',['student_id'=>$this->own->id,'jumlah_postingan'=>2]);
+  }finally{if(file_exists($path))unlink($path);}
+ }
+ public function test_student_lookup_returns_json_for_own_unit():void {
+  $this->actingAs($this->admin)->getJson('/students/lookup?q=0001')->assertOk()->assertJsonFragment(['noreg'=>'0001','nama_siswa'=>'Siswa 0001']);
+  $this->get('/nilai/create')->assertOk()->assertSee('data-url="/students/lookup"',false);
  }
  public function test_exported_user_text_is_not_an_excel_formula():void {
   $this->own->update(['nama_siswa'=>'=1+1']);$sheet=new StudentSheet($this->admin,$this->a->id,'Unit');$book=new Spreadsheet;$cell=$book->getActiveSheet()->getCell('A1');$sheet->bindValue($cell,'=1+1');$this->assertSame('s',$cell->getDataType());$this->assertSame('=1+1',$cell->getValue());

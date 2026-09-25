@@ -27,6 +27,18 @@ document.querySelectorAll("[data-student-picker]").forEach((picker) => {
     });
     eligible(row?.eligible === true);
   }
+  function lookupUrl(query) {
+    // Paksa same-origin agar salah APP_URL di server tidak mengarahkan fetch ke host lain.
+    const raw = picker.dataset.url || "/students/lookup";
+    let path = raw;
+    try {
+      const parsed = new URL(raw, window.location.origin);
+      path = parsed.pathname + parsed.search;
+    } catch (_) {}
+    const url = new URL(path, window.location.origin);
+    url.searchParams.set("q", query);
+    return url;
+  }
   eligible(picker.dataset.eligible === "1");
   select?.addEventListener("change", () => display(rows.get(select.value)));
   search?.addEventListener("input", () => {
@@ -45,13 +57,14 @@ document.querySelectorAll("[data-student-picker]").forEach((picker) => {
     timer = setTimeout(async () => {
       controller = new AbortController();
       try {
-        const url = new URL(picker.dataset.url, window.location.origin);
-        url.searchParams.set("q", q);
-        const response = await fetch(url, {
-          headers: { Accept: "application/json" },
+        const response = await fetch(lookupUrl(q), {
+          headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+          credentials: "same-origin",
           signal: controller.signal,
         });
         if (!response.ok) throw new Error("Lookup failed");
+        const contentType = response.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) throw new Error("Lookup failed");
         const data = await response.json();
         if (current !== sequence) return;
         data.forEach((row) => {

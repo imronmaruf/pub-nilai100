@@ -7,7 +7,7 @@
             ->find(old('student_id'));
     }
 @endphp
-<div data-student-picker data-url="{{ route('students.lookup') }}"
+<div data-student-picker data-url="{{ route('students.lookup', absolute: false) }}"
     data-eligible="{{ $selected?->nilai100?->contains(fn($nilai) => $nilai->status_testimoni === 'SUDAH') ? '1' : '0' }}"
     class="space-y-4">
     @if (!$student)
