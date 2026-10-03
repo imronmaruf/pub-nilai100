@@ -9,7 +9,7 @@
         class="max-w-2xl space-y-5">@csrf @if ($record->exists)
             @method('PUT')
         @endif
-        @include('partials.student-picker')
+        @include('partials.student-picker', ['showNilai100' => true])
         <p data-eligibility-message role="status" class="text-sm text-slate-600">Pilih siswa dengan Nilai 100 dan testimoni
             SUDAH untuk mengisi publikasi.</p>
         <fieldset data-publication-fields disabled class="space-y-4">

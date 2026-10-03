@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mapel;
+use App\Exports\TableExport;
 use Illuminate\Http\Request;
 use Illuminate\Validation\{Rule, ValidationException};
+use Maatwebsite\Excel\Facades\Excel;
 
 class MapelController extends Controller
 {
@@ -12,6 +14,11 @@ class MapelController extends Controller
   {
     $perPage = in_array($request->integer('per_page'), [10, 20, 30], true) ? $request->integer('per_page') : 10;
     return view('admin.mapels', ['rows' => Mapel::orderBy('kode')->paginate($perPage)->withQueryString(), 'record' => new Mapel]);
+  }
+  public function export()
+  {
+    $rows = Mapel::orderBy('kode')->get()->map(fn($mapel) => [$mapel->id, $mapel->kode, $mapel->nama])->all();
+    return Excel::download(new TableExport('Mapel', ['ID', 'Kode', 'Nama'], $rows), 'Data_Mapel_' . now()->format('Ymd_His') . '.xlsx');
   }
   public function edit(Request $request, string $mapel)
   {

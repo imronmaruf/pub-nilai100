@@ -16,21 +16,24 @@ Route::middleware(['auth', 'account'])->group(function () {
   Route::get('/all-data', [AllDataController::class, 'index'])->name('all-data.index');
   Route::get('/all-data/export', [AllDataController::class, 'export'])->middleware('throttle:5,1')->name('all-data.export');
   Route::get('/students/lookup', [StudentController::class, 'lookup'])->middleware('throttle:90,1')->name('students.lookup');
+  Route::get('/students/export', [StudentController::class, 'export'])->middleware('throttle:5,1')->name('students.export');
   Route::get('/students/import', [StudentController::class, 'importForm'])->name('students.import');
   Route::get('/students/import/template', [StudentController::class, 'template'])->name('students.import.template');
   Route::post('/students/import', [StudentController::class, 'import'])->middleware('throttle:5,1')->name('students.import.store');
   Route::resource('students', StudentController::class)->except('show');
   Route::get('/nilai', [NilaiController::class, 'index'])->name('nilai.index');
+  Route::get('/nilai/export', [NilaiController::class, 'export'])->middleware('throttle:5,1')->name('nilai.export');
   Route::get('/nilai/import', [NilaiController::class, 'importForm'])->name('nilai.import');
   Route::get('/nilai/import/template', [NilaiController::class, 'template'])->name('nilai.import.template');
   Route::post('/nilai/import', [NilaiController::class, 'import'])->middleware('throttle:5,1')->name('nilai.import.store');
   Route::get('/nilai/create', [NilaiController::class, 'create'])->name('nilai.create');
   Route::post('/nilai', [NilaiController::class, 'store'])->name('nilai.store');
-  Route::get('/nilai/{student}/edit', [NilaiController::class, 'edit'])->name('nilai.edit');
-  Route::put('/nilai/{student}', [NilaiController::class, 'update'])->name('nilai.update');
-  Route::delete('/nilai/{student}', [NilaiController::class, 'destroy'])->name('nilai.destroy');
+  Route::get('/nilai/{nilai}/edit', [NilaiController::class, 'edit'])->name('nilai.edit');
+  Route::put('/nilai/{nilai}', [NilaiController::class, 'update'])->name('nilai.update');
+  Route::delete('/nilai/{nilai}', [NilaiController::class, 'destroy'])->name('nilai.destroy');
   Route::prefix('publications/{channel}')->where(['channel' => 'ig|tiktok|wa'])->name('publications.')->group(function () {
     Route::get('/', [PublicationController::class, 'index'])->name('index');
+    Route::get('/export', [PublicationController::class, 'export'])->middleware('throttle:5,1')->name('export');
     Route::get('/import', [PublicationController::class, 'importForm'])->name('import');
     Route::get('/import/template', [PublicationController::class, 'template'])->name('import.template');
     Route::post('/import', [PublicationController::class, 'import'])->middleware('throttle:5,1')->name('import.store');
@@ -41,6 +44,9 @@ Route::middleware(['auth', 'account'])->group(function () {
     Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy');
   });
   Route::middleware('superadmin')->group(function () {
+    Route::get('/units/export', [UnitController::class, 'export'])->middleware('throttle:5,1')->name('units.export');
+    Route::get('/mapels/export', [MapelController::class, 'export'])->middleware('throttle:5,1')->name('mapels.export');
+    Route::get('/users/export', [UserController::class, 'export'])->middleware('throttle:5,1')->name('users.export');
     Route::resource('units', UnitController::class)->except(['create', 'show']);
     Route::resource('mapels', MapelController::class)->except(['create', 'show']);
     Route::resource('users', UserController::class)->except('show');

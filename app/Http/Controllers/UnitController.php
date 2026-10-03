@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Unit;
+use App\Exports\TableExport;
 use Illuminate\Http\Request;
 use Illuminate\Validation\{Rule, ValidationException};
+use Maatwebsite\Excel\Facades\Excel;
 
 class UnitController extends Controller
 {
@@ -12,6 +14,11 @@ class UnitController extends Controller
   {
     $perPage = in_array($r->integer('per_page'), [10, 20, 30], true) ? $r->integer('per_page') : 10;
     return view('admin.units', ['rows' => Unit::orderBy('kota')->paginate($perPage)->withQueryString(), 'record' => new Unit]);
+  }
+  public function export()
+  {
+    $rows = Unit::orderBy('kota')->get()->map(fn($unit) => [$unit->id, $unit->kota, $unit->nama_unit])->all();
+    return Excel::download(new TableExport('Unit', ['ID', 'Kota', 'Unit'], $rows), 'Data_Unit_' . now()->format('Ymd_His') . '.xlsx');
   }
   public function edit(Request $r, string $unit)
   {

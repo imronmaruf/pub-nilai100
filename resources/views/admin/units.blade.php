@@ -1,8 +1,10 @@
 @extends('layouts.app')
 @section('title', 'Unit')
 @section('content')
-    <h1 class="mb-5 text-lg font-semibold">
-        Unit</h1>
+    <div class="toolbar">
+        <h1 class="text-lg font-semibold">Unit</h1><a class="btn-secondary" href="{{ route('units.export') }}"><i
+                class="fa-solid fa-file-arrow-down"></i> Export Excel</a>
+    </div>
     <form method="POST" action="{{ $record->exists ? route('units.update', $record->id) : route('units.store') }}"
         class="mb-6 flex max-w-3xl flex-wrap items-end gap-3">@csrf @if ($record->exists)
             @method('PUT')
@@ -39,7 +41,8 @@
             </tbody>
         </table>
     </div>
-    <div class="mt-4 flex items-center justify-between"><span class="muted">{{ number_format($rows->total(), 0, ',', '.') }}
+    <div class="mt-4 flex items-center justify-between"><span
+            class="muted">{{ number_format($rows->total(), 0, ',', '.') }}
             data</span>
         <form method="GET"><select name="per_page" class="!w-auto" onchange="this.form.submit()">
                 <option value="10" @selected(request('per_page', 10) == 10)>10</option>

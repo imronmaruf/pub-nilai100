@@ -3,11 +3,14 @@
 @section('content')
     <div class="toolbar">
         <h1 class="text-lg font-semibold">Nilai 100</h1>
-        <div class="flex gap-2"><a class="btn-secondary" href="{{ route('nilai.import') }}"><i
-                    class="fa-solid fa-file-import"></i> Import Excel</a><a class="btn"
+        <div class="flex gap-2"><a class="btn-secondary" href="{{ route('nilai.export', request()->query()) }}"><i
+                    class="fa-solid fa-file-arrow-down"></i> Export Excel</a><a class="btn-secondary"
+                href="{{ route('nilai.import') }}"><i class="fa-solid fa-file-import"></i> Import Excel</a><a class="btn"
                 href="{{ route('nilai.create') }}">Input nilai</a></div>
     </div>
     <form class="filter-panel" method="GET">
+        <div class="field"><label class="label" for="q">Cari siswa</label><input id="q" name="q"
+                value="{{ $q }}" placeholder="Noreg atau nama" maxlength="100"></div>
         <div class="filter-grid">
             <div class="field"><label class="label">Kota</label><select name="kota[]" multiple data-filter-select>
                     @foreach ($cities as $city)
@@ -83,7 +86,7 @@
                         <td>{{ $n->status_testimoni }}</td>
                         <td>{{ $n->keterangan ?: '-' }}</td>
                         <td class="space-x-3 whitespace-nowrap"><a class="link"
-                                href="{{ route('nilai.edit', $n->student_id) }}">Edit</a><x-delete :action="route('nilai.destroy', $n->student_id)" />
+                                href="{{ route('nilai.edit', $n->id) }}">Edit</a><x-delete :action="route('nilai.destroy', $n->id)" />
                         </td>
                 </tr>@empty<tr>
                         <td colspan="10">Belum ada nilai.</td>
@@ -101,12 +104,13 @@
                     <input type="hidden" name="{{ is_array($value) ? $key . '[]' : $key }}" value="{{ $item }}">
                 @endforeach
             @endforeach
-            <label class="text-sm" for="per_page">Tampilkan</label><select
-                id="per_page" name="per_page" class="!w-auto" onchange="this.form.submit()">
+            <label class="text-sm" for="per_page">Tampilkan</label><select id="per_page" name="per_page" class="!w-auto"
+                onchange="this.form.submit()">
                 <option value="10" @selected(request('per_page', 10) == 10)>10</option>
                 <option value="20" @selected(request('per_page') == 20)>20</option>
                 <option value="30" @selected(request('per_page') == 30)>30</option>
-            </select></form>
+            </select>
+        </form>
     </div>
     <div class="pagination">{{ $rows->links() }}</div>
 @endsection

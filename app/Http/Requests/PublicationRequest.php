@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Services\{Access, PublicationService};
+use App\Models\Nilai100;
 
 class PublicationRequest extends FormRequest
 {
@@ -16,7 +17,10 @@ class PublicationRequest extends FormRequest
   {
     $channel = $this->route('channel');
     app(PublicationService::class)->model($channel);
-    $rules = ['student_id' => [$this->route('publication') ? 'prohibited' : 'required', 'integer']];
+    $rules = [
+      'student_id' => [$this->route('publication') ? 'prohibited' : 'required', 'integer'],
+      'nilai100_id' => [$this->route('publication') ? 'nullable' : 'required', 'integer', Rule::exists('nilai_100', 'id')]
+    ];
     if ($channel === 'wa') return $rules + [
       'jumlah_testimoni_terkirim' => 'required|integer|min:1|max:1000000',
       'tanggal_blast' => 'required|date_format:Y-m-d|before_or_equal:today',
@@ -40,10 +44,24 @@ class PublicationRequest extends FormRequest
       if ($v->errors()->isNotEmpty()) return;
       $service = app(PublicationService::class);
       $access = app(Access::class);
-      $id = $this->input('student_id');
-      if ($this->route('publication')) $id = $access->records($service->model($this->route('channel')), $this->user())->findOrFail($this->route('publication'))->student_id;
-      $s = $access->students($this->user())->with('nilai100')->findOrFail($id);
-      if (!$s->nilai100->contains(fn($nilai) => $nilai->status_testimoni === 'SUDAH')) $v->errors()->add('student_id', 'Publikasi membutuhkan Nilai 100 dengan testimoni SUDAH.');
+      $record = $this->route('publication')
+        ? $access->records($service->model($this->route('channel')), $this->user())->findOrFail($this->route('publication'))
+        : null;
+      $studentId = $record?->student_id ?? $this->input('student_id');
+      $student = $access->students($this->user())->findOrFail($studentId);
+      $gradeId = $this->input('nilai100_id', $record?->nilai100_id);
+      if ($gradeId === null || $gradeId === '') {
+        if (!$record) $v->errors()->add('nilai100_id', 'Pilih Nilai 100 yang akan dipublikasikan.');
+        elseif ($record->nilai100_id !== null) $v->errors()->add('nilai100_id', 'Pilih Nilai 100 yang akan dipublikasikan.');
+        else $service->eligible($student);
+        return;
+      }
+      $grade = $access->records(Nilai100::class, $this->user())->where('student_id', $student->id)->find($gradeId);
+      if (!$grade) {
+        $v->errors()->add('nilai100_id', 'Nilai 100 tidak sesuai dengan siswa yang dipilih.');
+        return;
+      }
+      $service->eligible($student, (int)$grade->id);
     }];
   }
 }

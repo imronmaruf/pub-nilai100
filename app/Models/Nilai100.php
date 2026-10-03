@@ -33,4 +33,8 @@ class Nilai100 extends Model
   {
     return $this->belongsTo(Student::class);
   }
+  public function mapelInfo(): BelongsTo
+  {
+    return $this->belongsTo(Mapel::class, 'mapel', 'kode');
+  }
 }

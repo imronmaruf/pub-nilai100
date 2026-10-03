@@ -15,8 +15,8 @@ class NilaiRequest extends FormRequest
   }
   public function rules(): array
   {
-    $id = $this->route('student');
-    if ($id) app(Access::class)->students($this->user())->findOrFail($id);
+    $id = $this->route('nilai');
+    if ($id) app(Access::class)->records(\App\Models\Nilai100::class, $this->user())->findOrFail($id);
     return [
       'student_id' => [$id ? 'prohibited' : 'required', 'integer'],
       'mapel' => ['required', Rule::in(Mapel::pluck('kode')->all())],
@@ -30,7 +30,7 @@ class NilaiRequest extends FormRequest
   public function after(): array
   {
     return [function ($v) {
-      if (!$this->route('student') && !$v->errors()->has('student_id')) app(Access::class)->students($this->user())->findOrFail($this->input('student_id'));
+      if (!$this->route('nilai') && !$v->errors()->has('student_id')) app(Access::class)->students($this->user())->findOrFail($this->input('student_id'));
     }];
   }
 }

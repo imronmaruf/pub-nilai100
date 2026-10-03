@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\{Nilai100, Student, Unit, User};
+use App\Models\{Nilai100, PublikasiIg, Student, Unit, User};
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -91,5 +91,19 @@ class ReportFiltersTest extends TestCase
         $response = $this->get('/students?kota[]=Kota+A&kota[]=Kota+B&nilai_status[]=sudah&nilai_status[]=belum')->assertOk();
         $this->assertEquals(3, $response->viewData('students')->total());
         $this->get('/students?unit_id=' . $this->a->id)->assertOk()->assertDontSee('Siswa 2');
+    }
+
+    public function test_nilai_search_and_publication_filters_match_student_identity_and_dates(): void
+    {
+        $student = Student::create(['noreg' => '00123', 'nama_siswa' => 'Dewi Contoh', 'asal_sekolah' => 'Sekolah', 'kelas_di_go' => '12', 'tingkat_kelas' => '12', 'level' => 'SMA', 'unit_id' => $this->a->id]);
+        Nilai100::create(['student_id' => $student->id, 'mapel' => 'MAT', 'jenis_nilai' => 'UH', 'tanggal_ujian' => '2026-01-01', 'status_testimoni' => 'SUDAH']);
+        PublikasiIg::create(['student_id' => $student->id, 'status_publikasi' => 'SUDAH', 'jumlah_postingan' => 1, 'tanggal_posting' => '2026-01-10', 'link_postingan' => 'https://instagram.com/p/example', 'view' => 10, 'like' => 2, 'komen' => 1]);
+        $this->actingAs($this->root);
+        $this->get('/nilai?q=Dewi')->assertOk()->assertSee('00123');
+        $this->get('/nilai?q=00123')->assertOk()->assertSee('Dewi Contoh');
+        $response = $this->get('/publications/ig?q=00123&status_publikasi=SUDAH&from=2026-01-09&to=2026-01-11')->assertOk()->assertSee('Dewi Contoh');
+        $this->assertSame(1, $response->viewData('rows')->total());
+        $response = $this->get('/publications/ig?status_publikasi=BELUM')->assertOk();
+        $this->assertSame(0, $response->viewData('rows')->total());
     }
 }

@@ -6,7 +6,8 @@
             <p class="eyebrow">Administrasi</p>
             <h1>Mapel Nilai 100</h1>
             <p class="muted">Kelola pilihan mata pelajaran yang tersedia untuk Nilai 100.</p>
-        </div>
+        </div><a class="btn-secondary" href="{{ route('mapels.export') }}"><i class="fa-solid fa-file-arrow-down"></i> Export
+            Excel</a>
     </div>
     <form method="POST" action="{{ $record->exists ? route('mapels.update', $record->id) : route('mapels.store') }}"
         class="filter-panel max-w-3xl">@csrf @if ($record->exists)
@@ -47,7 +48,8 @@
             </tbody>
         </table>
     </div>
-    <div class="mt-4 flex items-center justify-between"><span class="muted">{{ number_format($rows->total(), 0, ',', '.') }}
+    <div class="mt-4 flex items-center justify-between"><span
+            class="muted">{{ number_format($rows->total(), 0, ',', '.') }}
             mapel</span>
         <form method="GET"><select name="per_page" class="!w-auto" onchange="this.form.submit()">
                 <option value="10" @selected(request('per_page', 10) == 10)>10</option>

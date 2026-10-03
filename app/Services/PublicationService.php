@@ -16,8 +16,10 @@ class PublicationService
       default => abort(404)
     };
   }
-  public function eligible(Student $s): void
+  public function eligible(Student $s, ?int $nilai100Id = null): void
   {
-    if (!$s->nilai100()->where('status_testimoni', 'SUDAH')->exists()) throw ValidationException::withMessages(['student_id' => 'Publikasi membutuhkan Nilai 100 dengan testimoni SUDAH.']);
+    $query = $s->nilai100()->where('status_testimoni', 'SUDAH');
+    if ($nilai100Id !== null) $query->whereKey($nilai100Id);
+    if (!$query->exists()) throw ValidationException::withMessages([$nilai100Id !== null ? 'nilai100_id' : 'student_id' => 'Publikasi membutuhkan Nilai 100 terpilih dengan testimoni SUDAH.']);
   }
 }

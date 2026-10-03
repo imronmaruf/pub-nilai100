@@ -7,6 +7,7 @@ document.querySelectorAll("[data-student-picker]").forEach((picker) => {
   const form = picker.closest("form");
   const search = picker.querySelector("#student_search");
   const select = picker.querySelector("#student_id");
+  const gradeSelect = form.querySelector("[data-nilai100-select]");
   const fieldset = form.querySelector("[data-publication-fields]");
   const message = form.querySelector("[data-eligibility-message]");
   const status = picker.querySelector("[data-search-status]");
@@ -26,6 +27,25 @@ document.querySelectorAll("[data-student-picker]").forEach((picker) => {
       input.value = row?.[input.dataset.display] ?? "";
     });
     eligible(row?.eligible === true);
+    if (gradeSelect) {
+      gradeSelect.replaceChildren(
+        new Option(
+          row?.nilai100?.length
+            ? "Pilih Nilai 100"
+            : "Tidak ada Nilai 100 dengan testimoni SUDAH",
+          "",
+        ),
+      );
+      (row?.nilai100 ?? []).forEach((grade) => {
+        gradeSelect.add(
+          new Option(
+            `${grade.mapel} · ${grade.jenis_nilai} · ${grade.tanggal_ujian}`,
+            grade.id,
+          ),
+        );
+      });
+      gradeSelect.disabled = !row?.nilai100?.length;
+    }
   }
   function lookupUrl(query) {
     // Paksa same-origin agar salah APP_URL di server tidak mengarahkan fetch ke host lain.
@@ -58,13 +78,17 @@ document.querySelectorAll("[data-student-picker]").forEach((picker) => {
       controller = new AbortController();
       try {
         const response = await fetch(lookupUrl(q), {
-          headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+          headers: {
+            Accept: "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+          },
           credentials: "same-origin",
           signal: controller.signal,
         });
         if (!response.ok) throw new Error("Lookup failed");
         const contentType = response.headers.get("content-type") || "";
-        if (!contentType.includes("application/json")) throw new Error("Lookup failed");
+        if (!contentType.includes("application/json"))
+          throw new Error("Lookup failed");
         const data = await response.json();
         if (current !== sequence) return;
         data.forEach((row) => {
@@ -113,7 +137,9 @@ document.querySelectorAll("table[data-table]").forEach((table) => {
     header.setAttribute("title", "Urutkan kolom");
     header.addEventListener("click", () => {
       const body = table.tBodies[0];
-      const rows = [...body.rows].filter((row) => !row.classList.contains("total-row"));
+      const rows = [...body.rows].filter(
+        (row) => !row.classList.contains("total-row"),
+      );
       const direction = header.dataset.direction === "asc" ? -1 : 1;
       table
         .querySelectorAll("thead th")

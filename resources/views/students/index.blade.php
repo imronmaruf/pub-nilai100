@@ -3,20 +3,24 @@
 @section('content')
     <div class="toolbar">
         <h1 class="text-lg font-semibold">Data Siswa</h1>
-        <div class="flex gap-2"><a class="btn-secondary" href="{{ route('students.import') }}">Import Excel</a><a class="btn"
+        <div class="flex gap-2"><a class="btn-secondary" href="{{ route('students.export', request()->query()) }}"><i
+                    class="fa-solid fa-file-arrow-down"></i> Export Excel</a><a class="btn-secondary"
+                href="{{ route('students.import') }}">Import Excel</a><a class="btn"
                 href="{{ route('students.create') }}">Tambah siswa</a></div>
     </div>
     <form class="filter-panel" method="GET">
         <div class="filter-grid">
             <div class="field"><label class="label" for="q">Cari siswa</label><input id="q" name="q"
                     value="{{ request('q') }}" placeholder="Noreg atau nama" maxlength="100"></div>
-            <div class="field"><label class="label" for="kota">Kota</label><select id="kota" name="kota[]" multiple data-filter-select>
+            <div class="field"><label class="label" for="kota">Kota</label><select id="kota" name="kota[]"
+                    multiple data-filter-select>
                     @foreach ($cities as $city)
                         <option value="{{ $city }}" @selected(in_array($city, (array) request('kota', []), true))>{{ $city }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="field"><label class="label" for="unit_id">Unit</label><select id="unit_id" name="unit_id[]" multiple data-filter-select>
+            <div class="field"><label class="label" for="unit_id">Unit</label><select id="unit_id" name="unit_id[]"
+                    multiple data-filter-select>
                     @foreach ($units as $unit)
                         <option value="{{ $unit->id }}" @selected(in_array($unit->id, array_map('intval', (array) request('unit_id', [])), true))>{{ $unit->nama_unit }}</option>
                     @endforeach
@@ -43,7 +47,8 @@
                     @endforeach
                 </select>
             </div>
-            <div class="field"><label class="label" for="level">Level</label><select id="level" name="level[]" multiple data-filter-select>
+            <div class="field"><label class="label" for="level">Level</label><select id="level" name="level[]"
+                    multiple data-filter-select>
                     @foreach (['SD', 'SMP', 'SMA'] as $level)
                         <option value="{{ $level }}" @selected(in_array($level, (array) request('level', []), true))>{{ $level }}</option>
                     @endforeach

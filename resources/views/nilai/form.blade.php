@@ -3,7 +3,7 @@
 @section('content')
     <h1 class="mb-5 text-lg font-semibold">
         {{ $nilai->exists ? 'Edit Nilai' : 'Input Nilai 100' }}</h1>
-    <form method="POST" action="{{ $nilai->exists ? route('nilai.update', $student->id) : route('nilai.store') }}"
+    <form method="POST" action="{{ $nilai->exists ? route('nilai.update', $nilai->id) : route('nilai.store') }}"
         class="max-w-2xl space-y-5">@csrf @if ($nilai->exists)
             @method('PUT')
         @endif
@@ -32,7 +32,9 @@
             <x-field name="tanggal_ujian" label="Tanggal ujian" type="date" :value="$nilai->tanggal_ujian?->format('Y-m-d')" :max="today()->format('Y-m-d')"
                 required />
             <x-field name="tanggal_validasi_pt" label="Tanggal validasi PT" type="date" :value="$nilai->tanggal_validasi_pt?->format('Y-m-d')"
-                :max="today()->format('Y-m-d')" placeholder="-" /><p class="muted text-xs">Boleh kosong. Bila kosong, keterangan otomatis diberi catatan “cek tanggal validasi pt”.</p>
+                :max="today()->format('Y-m-d')" placeholder="-" />
+            <p class="muted text-xs">Boleh kosong. Bila kosong, keterangan otomatis diberi catatan “cek tanggal validasi
+                pt”.</p>
             <div class="field sm:col-span-2"><label for="keterangan" class="label">Keterangan</label>
                 <textarea id="keterangan" name="keterangan" rows="3" maxlength="1000"
                     placeholder="Keterangan tambahan (opsional)">{{ old('keterangan', $nilai->keterangan) }}</textarea>

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\{User, Unit};
+use App\Exports\TableExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\{Rule, ValidationException};
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -13,6 +15,11 @@ class UserController extends Controller
   {
     $perPage = in_array($r->integer('per_page'), [10, 20, 30], true) ? $r->integer('per_page') : 10;
     return view('admin.users', ['rows' => User::with('roles', 'unit')->orderBy('name')->paginate($perPage)->withQueryString()]);
+  }
+  public function export()
+  {
+    $rows = User::with('roles', 'unit')->orderBy('name')->get()->map(fn($user) => [$user->name, $user->email, $user->getRoleNames()->join(', '), $user->unit?->nama_unit ?? 'Semua unit'])->all();
+    return Excel::download(new TableExport('Akun', ['Nama', 'Email', 'Role', 'Unit'], $rows), 'Data_Akun_' . now()->format('Ymd_His') . '.xlsx');
   }
   public function create()
   {
